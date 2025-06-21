@@ -1,23 +1,38 @@
 import React, { createContext, useCallback, useContext, useState } from 'react'
 
 interface RootBackgroundContextType {
+  isAudioPlaying: boolean
+  toggleAudio: (play?: boolean) => void
   isVideoPlayed: boolean
   toggleVideo: (play?: boolean) => void
 }
 
 const RootBackgroundContext = createContext<RootBackgroundContextType>({
+  isAudioPlaying: false,
+  toggleAudio: () => { },
   isVideoPlayed: false,
-  toggleVideo: () => {},
+  toggleVideo: () => { },
 })
 
 export const RootBackgroundProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [isVideoPlayed, setIsVideoPlayed] = useState<boolean>(false)
+  const [isAudioPlaying, setIsAudioPlaying] = useState<boolean>(false)
 
-  const toggleVideo: RootBackgroundContextType['toggleVideo'] = useCallback((play) => {
-    setIsVideoPlayed((prev) => (play !== undefined ? play : !prev))
+  const toggleAudio: RootBackgroundContextType['toggleAudio'] = useCallback((play) => {
+    setIsAudioPlaying((prev) => (play !== undefined ? play : !prev))
   }, [])
 
-  return <RootBackgroundContext.Provider value={{ isVideoPlayed, toggleVideo }}>{children}</RootBackgroundContext.Provider>
+  return (
+    <RootBackgroundContext.Provider
+      value={{
+        isAudioPlaying,
+        toggleAudio,
+        isVideoPlayed: isAudioPlaying,
+        toggleVideo: toggleAudio
+      }}
+    >
+      {children}
+    </RootBackgroundContext.Provider>
+  )
 }
 
 export function useRootBackground(): RootBackgroundContextType {
